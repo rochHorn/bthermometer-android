@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BThermometer</string>
+    <string name="title_activity_temperature">TemperatureActivity</string>
 </resources>
