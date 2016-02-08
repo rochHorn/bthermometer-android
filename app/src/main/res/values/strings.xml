@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">BThermometer</string>
     <string name="title_activity_temperature">TemperatureActivity</string>
+    <string name="bt_not_supported">Device does not support Bluetooth!</string>
 </resources>
