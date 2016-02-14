@@ -12,47 +12,38 @@ import java.util.UUID;
  * Created by roch on 2/8/2016.
  */
 public class ConnectThread extends Thread {
-    private final BluetoothSocket mmSocket;
-    private final BluetoothDevice mmDevice;
+    private final BluetoothSocket socket;
     public static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothAdapter bluetoothAdapter;
 
     public ConnectThread(BluetoothDevice device, BluetoothAdapter bluetoothAdapter) {
-        // Use a temporary object that is later assigned to mmSocket,
-        // because mmSocket is final
-        this.mBluetoothAdapter = bluetoothAdapter;
+        this.bluetoothAdapter = bluetoothAdapter;
         BluetoothSocket tmp = null;
-        mmDevice = device;
 
-        // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
             // Well known SPP UUID
             tmp = device.createRfcommSocketToServiceRecord(SPP_UUID);
         } catch (IOException e) { }
-        mmSocket = tmp;
+        socket = tmp;
     }
 
     public void run() {
-        // Cancel discovery because it will slow down the connection
-        mBluetoothAdapter.cancelDiscovery();
+
+        bluetoothAdapter.cancelDiscovery();
 
         try {
-            // Connect the device through the socket. This will block
-            // until it succeeds or throws an exception
-            mmSocket.connect();
+            socket.connect();
             Log.i("BT_CONNECTING", "Connecting");
 
         } catch (IOException connectException) {
-            // Unable to connect; close the socket and get out
                 Log.i("BT_CONNECTION_ERROR", connectException.toString());
             try {
-                mmSocket.close();
+                socket.close();
             } catch (IOException closeException) { }
             return;
         }
 
-        // Do work to manage the connection (in a separate thread)
-        manageConnectedSocket(mmSocket);
+        manageConnectedSocket(socket);
     }
 
     private void manageConnectedSocket(BluetoothSocket mmSocket) {
@@ -60,10 +51,9 @@ public class ConnectThread extends Thread {
         connectedThread.run();
     }
 
-    /** Will cancel an in-progress connection, and close the socket */
     public void cancel() {
         try {
-            mmSocket.close();
+            socket.close();
         } catch (IOException e) { }
     }
 }

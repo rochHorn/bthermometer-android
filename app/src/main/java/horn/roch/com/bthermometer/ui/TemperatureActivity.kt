@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -23,9 +22,10 @@ class TemperatureActivity : AppCompatActivity() {
 
     val BT_MAC = "20:15:12:14:49:69"
     val eventBus = EventBus.getDefault()
-    val data = ArrayList<Entry>()
+    val tempEntry = ArrayList<Entry>()
     val xVals = ArrayList<String>()
-    val dataSets = ArrayList<ILineDataSet>()
+    val tempDataSets = ArrayList<ILineDataSet>()
+    val tempLineData = LineData(xVals, tempDataSets);
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,33 +43,34 @@ class TemperatureActivity : AppCompatActivity() {
     }
 
     @Subscribe
-    fun onEventMainThread(event: NewMessage) {
-        Log.i("NEW_MESSAGE", event.msg.toString())
-        runOnUiThread(Runnable { addData(event.msg) });
+    fun onEvent(event: NewMessage) {
+        runOnUiThread(Runnable { addData(event.msg) })
     };
 
-    fun addData(temp : Float){
-        var entry = Entry(temp, data.size);
-        data.add(entry)
-        xVals.add("");
+    fun addData(temp: Float) {
+        tempEntry.add(Entry(temp, tempEntry.size))
+        xVals.add("")
 
+        temperatureChart.setVisibleXRangeMaximum(10F);
+        temperatureChart.moveViewTo(tempLineData.xValCount - 11F, temp, YAxis.AxisDependency.RIGHT)
         temperatureChart.notifyDataSetChanged()
         temperatureChart.invalidate()
     }
 
-    fun setChart(){
-        val setComp1 = LineDataSet(data, "Temperature \u00B0C");
+    fun setChart() {
+        val tempLineDataSet = LineDataSet(tempEntry, getString(R.string.temperature))
+        tempLineDataSet.setDrawValues(false);
 
-        dataSets.add(setComp1);
-        val lineDataSet = LineData(xVals, dataSets);
+        tempDataSets.add(tempLineDataSet);
+        temperatureChart.data = tempLineData
+        temperatureChart.setDescription("")
 
-        temperatureChart.data = lineDataSet
         val leftAxis = temperatureChart.getAxis(YAxis.AxisDependency.LEFT);
         leftAxis.axisMaxValue = 50f
         leftAxis.axisMinValue = 0f
 
         val rightAxis = temperatureChart.getAxis(YAxis.AxisDependency.RIGHT);
-        rightAxis.axisMaxValue = 100f
+        rightAxis.axisMaxValue = 50f
         rightAxis.axisMinValue = 0f
 
         temperatureChart.invalidate()
@@ -94,7 +95,6 @@ class TemperatureActivity : AppCompatActivity() {
                     val connectThread = ConnectThread(device, bluetoothAdapter)
                     connectThread.start()
                 }
-                Log.i("PAIRED_DEVICES", device.name + "\n" + device.address);
             }
         }
     }
