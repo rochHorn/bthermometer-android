@@ -3,4 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="chart_dot_stroke">1dp</dimen>
+    <dimen name="chart_dot_radius">5dp</dimen>
+    <dimen name="chart_line">2dp</dimen>
+    <dimen name="chart_label_spacing">20dp</dimen>
 </resources>

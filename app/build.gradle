@@ -20,6 +20,10 @@ android {
     }
 }
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
@@ -29,7 +33,8 @@ dependencies {
     compile "org.jetbrains.anko:anko-support-v4:$anko_version"
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
-    compile 'com.diogobernardino:williamchart:2.2'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.2.2'
+    compile 'org.greenrobot:eventbus:3.0.0'
 }
 
 buildscript {

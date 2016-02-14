@@ -8,7 +8,7 @@
     tools:context="horn.roch.com.bthermometer.ui.TemperatureActivity"
     tools:showIn="@layout/activity_temperature">
 
-    <com.db.chart.view.LineChartView
+    <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/temperatureChart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

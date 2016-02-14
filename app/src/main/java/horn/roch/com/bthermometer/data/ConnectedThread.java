@@ -3,9 +3,14 @@ package horn.roch.com.bthermometer.data;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+
+import horn.roch.com.bthermometer.events.NewMessage;
 
 /**
  * Created by roch on 2/8/2016.
@@ -14,8 +19,12 @@ public class ConnectedThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
+    private EventBus eventBus = EventBus.getDefault();
+    byte[] msgBuffer = new byte[5];
+    int msgIndex = 0;
 
-    public ConnectedThread(BluetoothSocket socket) {
+
+        public ConnectedThread(BluetoothSocket socket) {
         mmSocket = socket;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
@@ -43,11 +52,7 @@ public class ConnectedThread extends Thread {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
-                // Send the obtained bytes to the UI activity
-//                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-//                        .sendToTarget();
-                String s = messageToHex(buffer, bytes);
-                Log.i("BT_READ_MSG", s);
+                parseMessage(buffer, bytes);
             } catch (IOException e) {
                 break;
             }
@@ -70,11 +75,19 @@ public class ConnectedThread extends Thread {
         }
     }
 
-    private String messageToHex(byte[] buffer, int bytes) {
-        StringBuilder sb = new StringBuilder();
+    private void parseMessage(byte[] buffer, int bytes) {
         for (int i = 0; i < bytes; ++i) {
-            sb.append(String.format("%02X ", buffer[i]));
+            if(buffer[i] != "|".getBytes()[0]){
+                msgBuffer[msgIndex] = buffer[i];
+                ++msgIndex;
+            }else {
+                msgIndex = 0;
+                try {
+                    eventBus.post(new NewMessage(Float.valueOf(new String(msgBuffer, "UTF-8"))));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        return sb.toString();
     }
 }
